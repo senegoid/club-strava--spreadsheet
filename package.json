@@ -1,6 +1,11 @@
 {
   "name": "club-strava-spreadsheet",
   "version": "0.0.1",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
   "dependencies": {
     "dotenv": "^8.2.0",
     "ejs": ">= 0.0.0",
