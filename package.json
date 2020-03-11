@@ -4,7 +4,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "ejs": ">= 0.0.0",
-    "express": "2.x.x",
+    "express": "3.x.x",
     "google-spreadsheet": "^3.0.9",
     "passport": ">= 0.0.0",
     "passport-strava-oauth2": ">= 0.1.1"
