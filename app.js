@@ -1,28 +1,28 @@
 require('dotenv').config()
-var express = require('express');
+var express = require('express')
 
-  
-var logger = require('morgan');
 
-  
-var cookieParser = require('cookie-parser');
+var logger = require('morgan')
 
-  
-var bodyParser = require('body-parser');
 
-  
-var session = require('express-session');
+var cookieParser = require('cookie-parser')
 
-  
-var methodOverride = require('method-override');
 
-  
-var passport = require('passport');
+var bodyParser = require('body-parser')
 
-  
-var util = require('util');
 
-  
+var session = require('express-session')
+
+
+var methodOverride = require('method-override')
+
+
+var passport = require('passport')
+
+
+var util = require('util')
+
+
 var StravaStrategy = require('passport-strava-oauth2').Strategy
 
 var STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID
@@ -50,7 +50,7 @@ passport.deserializeUser(function (obj, done) {
 passport.use(new StravaStrategy({
   clientID: STRAVA_CLIENT_ID,
   clientSecret: STRAVA_CLIENT_SECRET,
-  callbackURL: 'http://127.0.0.1:3000/auth/strava/callback'
+  callbackURL: process.env.STRAVA_CALLBACK_URL
 },
 function (accessToken, refreshToken, profile, done) {
   // asynchronous verification, for effect...
