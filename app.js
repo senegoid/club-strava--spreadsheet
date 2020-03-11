@@ -52,16 +52,16 @@ passport.use(new StravaStrategy({
   clientSecret: STRAVA_CLIENT_SECRET,
   callbackURL: process.env.STRAVA_CALLBACK_URL
 },
-function (accessToken, refreshToken, profile, done) {
-  // asynchronous verification, for effect...
-  process.nextTick(function () {
-    // To keep the example simple, the user's Strava profile is returned to
-    // represent the logged-in user.  In a typical application, you would want
-    // to associate the Strava account with a user record in your database,
-    // and return that user instead.
-    return done(null, profile)
-  })
-}
+  function (accessToken, refreshToken, profile, done) {
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+      // To keep the example simple, the user's Strava profile is returned to
+      // represent the logged-in user.  In a typical application, you would want
+      // to associate the Strava account with a user record in your database,
+      // and return that user instead.
+      return done(null, profile)
+    })
+  }
 ))
 
 var app = express()
@@ -99,7 +99,7 @@ app.get('/login', function (req, res) {
 //   redirecting the user to strava.com.  After authorization, Strava
 //   will redirect the user back to this application at /auth/strava/callback
 app.get('/auth/strava',
-  passport.authenticate('strava', { scope: ['public'] }),
+  passport.authenticate('strava', { scope: ['activity:read_all'] }),
   function (req, res) {
     // The request will be redirected to Strava for authentication, so this
     // function will not be called.
@@ -141,7 +141,7 @@ app.route('/webhook').post((req, res) => {
 
 app.listen(process.env.PORT || 3000)
 
-function ensureAuthenticated (req, res, next) {
+function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next() }
   res.redirect('/login')
 }
