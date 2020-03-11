@@ -97,7 +97,7 @@ app.get('/webhook', (req, res) => {
   }
 })
 
-app.listen(3000)
+app.listen(process.env.PORT || 3000)
 
 function ensureAuthenticated (req, res, next) {
   if (req.isAuthenticated()) { return next() }
