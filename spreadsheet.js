@@ -3,8 +3,21 @@ const { GoogleSpreadsheet } = require('google-spreadsheet')
 
 const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREADSHEET)
 
+const gravarEvento = async (evento) => {
+  await doc.useServiceAccountAuth(JSON.parse(process.env.GOOGLE_CREDS))
+  await doc.loadInfo()
+  const eventos = doc.sheetsByIndex[1]
+  eventos.addRow(evento)
+}
+
+const gravarAtividade = async (atividade) => {
+  await doc.useServiceAccountAuth(JSON.parse(process.env.GOOGLE_CREDS))
+  await doc.loadInfo()
+  const atividades = doc.sheetsByIndex[0]
+  atividades.addRow(atividade)
+}
+
 const testar = async () => {
-  // console.log(JSON.stringify(config))
   await doc.useServiceAccountAuth(JSON.parse(process.env.GOOGLE_CREDS))
 
   await doc.loadInfo() // loads document properties and worksheets
@@ -40,4 +53,7 @@ const testar = async () => {
 
   // await rows[1].delete() // delete a row
 }
-testar()
+module.exports = {
+  gravarEvento,
+  gravarAtividade
+}
