@@ -20,7 +20,7 @@ const gravarAtividade = async (atividade) => {
 const testar = async () => {
   await doc.useServiceAccountAuth(JSON.parse(process.env.GOOGLE_CREDS))
 
-  await doc.loadInfo() // loads document properties and worksheets
+  await doc.loadInfo()
   console.log(doc.title)
   await doc.updateProperties({ title: 'Ladeira' })
 

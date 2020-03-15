@@ -1,3 +1,4 @@
 node_modules
 creds-from-google.json
 .env
+data

@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const logger = require('morgan')
+const fs = require('fs').promises
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const session = require('express-session')
@@ -11,6 +12,9 @@ const path = require('path')
 const StravaStrategy = require('passport-strava-oauth2').Strategy
 const engine = require('ejs-locals')
 const spreadsheet = require('./spreadsheet')
+const strava = require('./strava')
+const stravaConfigTemplate = '/scripts/strava_config'
+const stravaConfig = 'data/strava_config'
 
 // use ejs-locals for all ejs templates:
 
@@ -18,6 +22,7 @@ const usuarios = []
 
 const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID
 const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET
+const STRAVA_CALLBACK_URL = process.env.STRAVA_CALLBACK_URL
 
 passport.serializeUser(function (user, done) {
   done(null, user)
@@ -30,14 +35,14 @@ passport.deserializeUser(function (obj, done) {
 passport.use(new StravaStrategy({
   clientID: STRAVA_CLIENT_ID,
   clientSecret: STRAVA_CLIENT_SECRET,
-  callbackURL: process.env.STRAVA_CALLBACK_URL
+  callbackURL: STRAVA_CALLBACK_URL
 },
-function (accessToken, refreshToken, profile, done) {
-  usuarios.push({ accessToken, refreshToken, profile })
-  process.nextTick(function () {
-    return done(null, profile)
-  })
-}
+  function (accessToken, refreshToken, profile, done) {
+    usuarios.push({ accessToken, refreshToken, profile })
+    process.nextTick(function () {
+      return done(null, profile)
+    })
+  }
 ))
 
 const app = express()
@@ -60,7 +65,7 @@ app.get('/', function (req, res) {
   res.render('index', { user: req.user })
 })
 
-app.get('/account', ensureAuthenticated, function (req, res) {
+app.get('/account', ensureAuthenticated, async function (req, res) {
   res.render('account', { user: req.user })
 })
 
@@ -69,7 +74,7 @@ app.get('/login', function (req, res) {
 })
 
 app.get('/auth/strava',
-  passport.authenticate('strava', { scope: ['activity:read_all'] }),
+  passport.authenticate('strava', { scope: ['activity:write,profile:write,read_all,profile:read_all,activity:read_all'] }),
   function (req, res) {
 
   })
@@ -77,6 +82,8 @@ app.get('/auth/strava',
 app.get('/auth/strava/callback',
   passport.authenticate('strava', { failureRedirect: '/login' }),
   function (req, res) {
+    usuarios[usuarios.length - 1].code = req.query.code
+    gravarConfig(usuarios[usuarios.length - 1])
     res.redirect('/')
   })
 
@@ -109,7 +116,22 @@ app.get('/webhook', function (req, res) {
 
 app.listen(process.env.PORT || 3000)
 
-function ensureAuthenticated (req, res, next) {
+function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next() }
   res.redirect('/login')
+}
+
+async function gravarConfig(user) {
+  var content = await fs.readFile(path.join(__dirname, stravaConfigTemplate))
+  await fs.writeFile(stravaConfig, content)
+  content = await fs.readFile(stravaConfig)
+  var config = JSON.parse(content)
+  config.client_id = STRAVA_CLIENT_ID
+  config.client_secret = STRAVA_CLIENT_SECRET
+  config.access_token = user.accessToken
+  config.redirect_uri = STRAVA_CALLBACK_URL
+  config.code = user.code
+
+  await fs.writeFile(stravaConfig, JSON.stringify(config, null, 2))
+  strava.config()
 }

@@ -1,14 +1,25 @@
-const client = require('strava-v3')
-const sheet = require('./spreadsheet')
+const fs = require('fs').promises
+const strava = require('strava-v3')
+// const sheet = require('./spreadsheet')
 
-const atividade = async (id, token) => {
-  const payload = await client.activities.get({ 'id': id, 'access_token': token })
-  // console.log(payload)
+let cfg = null
+
+const config = async (force = false) => {
+  if (cfg == null || force) {
+    const content = await fs.readFile('data/strava_config')
+    cfg = JSON.parse(content)
+    await strava.config(cfg)
+  }
+}
+
+const atividade = async (id) => {
+  config()
+  const payload = await strava.activities.get({ 'id': id })
   return payload
 }
-const atv = atividade('3172895150', '75ee4157d893a0da62e8947baa12d0282b26f58e')
-sheet.gravarAtividade(atv)
+// sheet.gravarAtividade(atv)
 // Ladeira = 491156
 module.exports = {
-  atividade
+  atividade,
+  config
 }
