@@ -38,12 +38,12 @@ passport.use(new StravaStrategy({
   clientSecret: STRAVA_CLIENT_SECRET,
   callbackURL: STRAVA_CALLBACK_URL
 },
-function (accessToken, refreshToken, profile, done) {
-  usuarios.push({ accessToken, refreshToken, profile })
-  process.nextTick(function () {
-    return done(null, profile)
-  })
-}
+  function (accessToken, refreshToken, profile, done) {
+    usuarios.push({ accessToken, refreshToken, profile })
+    process.nextTick(function () {
+      return done(null, profile)
+    })
+  }
 ))
 
 const app = express()
@@ -117,12 +117,12 @@ app.get('/webhook', function (req, res) {
 
 app.listen(process.env.PORT || 3000)
 
-function ensureAuthenticated (req, res, next) {
+function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next() }
   res.redirect('/login')
 }
 
-async function gravarConfig (user) {
+async function gravarConfig(user) {
   var content = await fs.readFile(path.join(__dirname, stravaConfigTemplate))
   await fs.writeFile(stravaConfig, content)
   content = await fs.readFile(stravaConfig)
@@ -135,5 +135,6 @@ async function gravarConfig (user) {
 
   await fs.writeFile(stravaConfig, JSON.stringify(config, null, 2))
   await strava.config()
+  spreadsheet.gravarAcesso({ id: user.profile.id, nome: user.profile.displayName, token: user.accessToken, code: user.code, data: Date() })
   return true
 }

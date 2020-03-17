@@ -1,6 +1,15 @@
 <% layout('layout') -%>
 <% if (!user) { %>
-<h2>Welcome! Please log in.</h2>
+<h2>Bem vindo.</h2>
 <% } else { %>
-<h2>Hello, <%= user.displayName %>.</h2>
+<h2>Olá, <%= user.displayName %>.</h2>
 <% } %>
+<iframe allowtransparency frameborder='0' height='160' scrolling='no'
+    src='https://www.strava.com/clubs/491156/latest-rides/57c02ccec23b1b17c3e1fd670edee2fe05271661?show_rides=false'
+    width='650'>
+</iframe>
+</br>
+<iframe allowtransparency frameborder='0' height='800' scrolling='no'
+    src='https://www.strava.com/clubs/491156/latest-rides/57c02ccec23b1b17c3e1fd670edee2fe05271661?show_rides=true'
+    width='650'>
+</iframe>

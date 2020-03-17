@@ -2,7 +2,7 @@ require('dotenv').config()
 const fs = require('fs').promises
 const strava = require('strava-v3')
 const axios = require('axios')
-// const sheet = require('./spreadsheet')
+const sheet = require('./spreadsheet')
 
 let cfg = null
 const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID
@@ -17,6 +17,7 @@ const config = async (force = false) => {
     const content = await fs.readFile('data/strava_config')
     cfg = JSON.parse(content)
     await strava.config(cfg)
+
     const params = {
       client_id: STRAVA_CLIENT_ID,
       client_secret: STRAVA_CLIENT_SECRET
@@ -24,12 +25,12 @@ const config = async (force = false) => {
 
     const subs = await axios.get(baseURL, { params })
     subs.data.map(async (sub) => {
-      await axios.delete(`${baseURL}/${sub.id}`, { params })
+      // await axios.delete(`${baseURL}/${sub.id}`, { params })
     })
     params.callback_url = STRAVA_WEBHOOK
     params.verify_token = STRAVA_VERIFY_TOKEN
-    const resp = await axios.post(baseURL, params)
-    console.log(resp)
+    // const resp = await axios.post(baseURL, params)
+    // console.log(resp)
   }
   return true
 }

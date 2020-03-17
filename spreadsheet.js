@@ -11,6 +11,14 @@ const gravarEvento = async (evento) => {
   eventos.addRow(evento)
 }
 
+const gravarAcesso = async (acesso) => {
+  await doc.useServiceAccountAuth(JSON.parse(process.env.GOOGLE_CREDS))
+  await doc.loadInfo()
+  const acessos = doc.sheetsByIndex[2]
+  // acesso.updates = JSON.stringify(acesso.updates)
+  acessos.addRow(acesso)
+}
+
 const gravarAtividade = async (atividade) => {
   await doc.useServiceAccountAuth(JSON.parse(process.env.GOOGLE_CREDS))
   await doc.loadInfo()
@@ -56,5 +64,6 @@ const testar = async () => {
 }
 module.exports = {
   gravarEvento,
-  gravarAtividade
+  gravarAtividade,
+  gravarAcesso
 }
