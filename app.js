@@ -23,6 +23,7 @@ const usuarios = []
 const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID
 const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET
 const STRAVA_CALLBACK_URL = process.env.STRAVA_CALLBACK_URL
+const STRAVA_VERIFY_TOKEN = process.env.STRAVA_VERIFY_TOKEN
 
 passport.serializeUser(function (user, done) {
   done(null, user)
@@ -37,12 +38,12 @@ passport.use(new StravaStrategy({
   clientSecret: STRAVA_CLIENT_SECRET,
   callbackURL: STRAVA_CALLBACK_URL
 },
-  function (accessToken, refreshToken, profile, done) {
-    usuarios.push({ accessToken, refreshToken, profile })
-    process.nextTick(function () {
-      return done(null, profile)
-    })
-  }
+function (accessToken, refreshToken, profile, done) {
+  usuarios.push({ accessToken, refreshToken, profile })
+  process.nextTick(function () {
+    return done(null, profile)
+  })
+}
 ))
 
 const app = express()
@@ -99,29 +100,29 @@ app.post('/webhook', function (req, res) {
 })
 
 app.get('/webhook', function (req, res) {
-  const VERIFY_TOKEN = 'STRAVA'
   let mode = req.query['hub.mode']
   let token = req.query['hub.verify_token']
   let challenge = req.query['hub.challenge']
   if (mode && token) {
-    if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+    if (mode === 'subscribe' && token === STRAVA_VERIFY_TOKEN) {
       console.log('WEBHOOK_VERIFIED')
       res.json({ 'hub.challenge': challenge })
     } else {
       res.sendStatus(403)
     }
+  } else {
+    res.sendStatus(404)
   }
-  res.sendStatus(404)
 })
 
 app.listen(process.env.PORT || 3000)
 
-function ensureAuthenticated(req, res, next) {
+function ensureAuthenticated (req, res, next) {
   if (req.isAuthenticated()) { return next() }
   res.redirect('/login')
 }
 
-async function gravarConfig(user) {
+async function gravarConfig (user) {
   var content = await fs.readFile(path.join(__dirname, stravaConfigTemplate))
   await fs.writeFile(stravaConfig, content)
   content = await fs.readFile(stravaConfig)
@@ -133,5 +134,6 @@ async function gravarConfig(user) {
   config.code = user.code
 
   await fs.writeFile(stravaConfig, JSON.stringify(config, null, 2))
-  strava.config()
+  await strava.config()
+  return true
 }

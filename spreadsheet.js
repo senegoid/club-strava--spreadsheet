@@ -7,6 +7,7 @@ const gravarEvento = async (evento) => {
   await doc.useServiceAccountAuth(JSON.parse(process.env.GOOGLE_CREDS))
   await doc.loadInfo()
   const eventos = doc.sheetsByIndex[1]
+  evento.updates = JSON.stringify(evento.updates)
   eventos.addRow(evento)
 }
 
