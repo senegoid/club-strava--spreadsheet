@@ -25,12 +25,12 @@ const config = async (force = false) => {
 
     const subs = await axios.get(baseURL, { params })
     subs.data.map(async (sub) => {
-      // await axios.delete(`${baseURL}/${sub.id}`, { params })
+      await axios.delete(`${baseURL}/${sub.id}`, { params })
     })
     params.callback_url = STRAVA_WEBHOOK
     params.verify_token = STRAVA_VERIFY_TOKEN
-    // const resp = await axios.post(baseURL, params)
-    // console.log(resp)
+    const resp = await axios.post(baseURL, params)
+    console.log(resp)
   }
   return true
 }
