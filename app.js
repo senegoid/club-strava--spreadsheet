@@ -124,7 +124,7 @@ function ensureAuthenticated(req, res, next) {
 
 async function gravarConfig(user) {
   var content = await fs.readFile(path.join(__dirname, stravaConfigTemplate))
-  await fs.writeFile(stravaConfig, content)
+  await fs.writeFile(`${__dirname}/${stravaConfig}`, content)
   content = await fs.readFile(stravaConfig)
   var config = JSON.parse(content)
   config.client_id = STRAVA_CLIENT_ID
@@ -133,7 +133,7 @@ async function gravarConfig(user) {
   config.redirect_uri = STRAVA_CALLBACK_URL
   config.code = user.code
 
-  await fs.writeFile(stravaConfig, JSON.stringify(config, null, 2))
+  await fs.writeFile(`${__dirname}/${stravaConfig}`, JSON.stringify(config, null, 2))
   await strava.config()
   spreadsheet.gravarAcesso({ id: user.profile.id, nome: user.profile.displayName, token: user.accessToken, code: user.code, data: Date() })
   return true

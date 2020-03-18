@@ -14,7 +14,7 @@ const baseURL = 'https://www.strava.com/api/v3/push_subscriptions'
 
 const config = async (force = false) => {
   if (cfg == null || force) {
-    const content = await fs.readFile('data/strava_config')
+    const content = await fs.readFile(`${__dirname}/data/strava_config`)
     cfg = JSON.parse(content)
     await strava.config(cfg)
 
